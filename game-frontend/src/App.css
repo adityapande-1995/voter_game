@@ -1,11 +1,24 @@
 .App {
     text-align: center;
     margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-container {
+    position: relative;
+    width: 80%;
+    height: 60vh;
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+    resize: both;
+    overflow: auto;
 }
 
 .square {
-    width: 50px;
-    height: 50px;
+    width: 5%;
+    height: 5%;
     background-color: blue;
     position: absolute;
     transition: top 0.5s, left 0.5s;
@@ -22,5 +35,25 @@ button {
 
 .votes {
     margin-top: 20px;
+}
+
+.leaderboard {
+    margin-top: 20px;
+}
+
+.logs {
+    width: 80%;
+    height: 30vh;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+    overflow: auto;
+    resize: both;
+}
+
+.log-messages {
+    padding: 10px;
+    height: 100%;
+    overflow-y: scroll;
+    text-align: left;
 }
 
