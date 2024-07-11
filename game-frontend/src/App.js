@@ -5,6 +5,7 @@ import './App.css';
 const App = () => {
     const [position, setPosition] = useState({ top: 50, left: 50 });
     const [votes, setVotes] = useState({ up: 0, down: 0, left: 0, right: 0 });
+    const [leaderboard, setLeaderboard] = useState({ up: 0, down: 0, left: 0, right: 0 });
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -17,6 +18,14 @@ const App = () => {
                 .catch(error => {
                     console.error('Error fetching votes:', error);
                 });
+
+            axios.get('http://localhost:8081/leaderboard')
+                .then(response => {
+                    setLeaderboard(response.data.votes);
+                })
+                .catch(error => {
+                    console.error('Error fetching leaderboard:', error);
+                });
         }, 1000);
 
         return () => clearInterval(interval);
@@ -27,7 +36,6 @@ const App = () => {
             let newTop = prevPosition.top;
             let newLeft = prevPosition.left;
 
-            // Adjust the square size and screen limits
             const squareSize = 5; // in percentage
             const screenLimit = 100;
 
@@ -67,6 +75,13 @@ const App = () => {
                 <p>Down: {votes.down}</p>
                 <p>Left: {votes.left}</p>
                 <p>Right: {votes.right}</p>
+            </div>
+            <div className="leaderboard">
+                <h3>Leaderboard</h3>
+                <p>Up: {leaderboard.up}</p>
+                <p>Down: {leaderboard.down}</p>
+                <p>Left: {leaderboard.left}</p>
+                <p>Right: {leaderboard.right}</p>
             </div>
         </div>
     );

@@ -1,6 +1,7 @@
 package main
 
 import (
+    "bytes"
     "encoding/json"
     "log"
     "net/http"
@@ -33,6 +34,7 @@ func voteHandler(w http.ResponseWriter, r *http.Request) {
     mutex.Lock()
     voteCounts[v.Direction]++
     mutex.Unlock()
+    sendVoteToLeaderboard(v) // Send vote to leaderboard
     w.WriteHeader(http.StatusOK)
 }
 
@@ -56,19 +58,27 @@ func resetVotes() {
         mutex.Lock()
         maxDirection := "up"
         maxCount := 0
-        for direction, count := range voteCounts {
+        for dir, count := range voteCounts {
             if count > maxCount {
                 maxCount = count
-                maxDirection = direction
+                maxDirection = dir
             }
         }
         log.Printf("Votes - Up: %d, Down: %d, Left: %d, Right: %d", voteCounts["up"], voteCounts["down"], voteCounts["left"], voteCounts["right"])
         log.Printf("Majority Direction: %s", maxDirection)
         direction = maxDirection
-        for direction := range voteCounts {
-            voteCounts[direction] = 0
+        for dir := range voteCounts {
+            voteCounts[dir] = 0
         }
         mutex.Unlock()
+    }
+}
+
+func sendVoteToLeaderboard(v Vote) {
+    jsonValue, _ := json.Marshal(v)
+    _, err := http.Post("http://localhost:8081/vote", "application/json", bytes.NewBuffer(jsonValue))
+    if err != nil {
+        log.Printf("Error sending vote to leaderboard: %v", err)
     }
 }
 

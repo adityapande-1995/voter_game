@@ -9,6 +9,15 @@ start_backend() {
     cd ..
 }
 
+# Function to start the leaderboard server
+start_leaderboard() {
+    echo "Starting leaderboard server..."
+    cd leaderboard
+    go run main.go &
+    LEADERBOARD_PID=$!
+    cd ..
+}
+
 # Function to start the frontend server
 start_frontend() {
     echo "Starting frontend server..."
@@ -21,7 +30,7 @@ start_frontend() {
 # Function to start the spam voting script
 start_spam_script() {
     echo "Starting spam voting script..."
-    ./spam_votes.sh &
+    ./bot_players/spam_votes.sh &
     SPAM_PID=$!
 }
 
@@ -29,6 +38,7 @@ start_spam_script() {
 stop_all() {
     echo "Stopping all processes..."
     kill $BACKEND_PID
+    kill $LEADERBOARD_PID
     kill $FRONTEND_PID
     kill $SPAM_PID
     exit 0
@@ -39,6 +49,7 @@ trap stop_all SIGINT
 
 # Start all services
 start_backend
+start_leaderboard
 start_frontend
 start_spam_script
 
