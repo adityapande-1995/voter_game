@@ -92,13 +92,13 @@ const App = () => {
                     <p>Left: {leaderboard.left}</p>
                     <p>Right: {leaderboard.right}</p>
                 </div>
-            </div>
-            <div className="logs">
-                <h3>Logs</h3>
-                <div className="log-messages">
-                    {logs.map((log, index) => (
-                        <p key={index}>{log}</p>
-                    ))}
+                <div className="logs">
+                    <h3>Logs</h3>
+                    <div className="log-messages">
+                        {logs.map((log, index) => (
+                            <p key={index}>{log}</p>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

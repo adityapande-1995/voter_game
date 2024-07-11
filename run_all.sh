@@ -1,12 +1,15 @@
 #!/bin/bash
 
-# Function to start the backend server
+# Function to build Docker image for backend
+build_backend_image() {
+    echo "Building backend Docker image..."
+    docker compose build
+}
+
+# Function to start the backend container
 start_backend() {
-    echo "Starting backend server..."
-    cd game-backend
-    go run main.go &
-    BACKEND_PID=$!
-    cd ..
+    echo "Starting backend container..."
+    docker compose up -d
 }
 
 # Function to start the leaderboard server
@@ -25,6 +28,7 @@ start_frontend() {
     npm start &
     FRONTEND_PID=$!
     cd ..
+    sleep 5 # Give the frontend some time to start
 }
 
 # Function to start the spam voting script
@@ -34,21 +38,27 @@ start_spam_script() {
     SPAM_PID=$!
 }
 
-# Function to stop all running processes
+# Function to stop all running processes and containers
 stop_all() {
-    echo "Stopping all processes..."
-    kill $BACKEND_PID
+    echo "Stopping all processes and containers..."
+    docker compose down
     kill $LEADERBOARD_PID
     kill $FRONTEND_PID
     kill $SPAM_PID
     exit 0
 }
 
-# Trap CTRL+C to stop all processes
+# Trap CTRL+C to stop all processes and containers
 trap stop_all SIGINT
+
+# Build Docker image for backend
+build_backend_image
 
 # Start all services
 start_backend
+# Follow backend logs in the background
+docker compose logs -f backend &
+
 start_leaderboard
 start_frontend
 start_spam_script

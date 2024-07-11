@@ -26,10 +26,12 @@ func voteHandler(w http.ResponseWriter, r *http.Request) {
     var v Vote
     if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
+        log.Printf("Failed to decode vote: %v\n", err)
         return
     }
     mutex.Lock()
     voteCounts[v.Direction]++
+    log.Printf("Received vote: %s, Current counts: %v\n", v.Direction, voteCounts)
     mutex.Unlock()
     w.WriteHeader(http.StatusOK)
 }
@@ -44,6 +46,7 @@ func leaderboardHandler(w http.ResponseWriter, r *http.Request) {
     }
     mutex.Unlock()
     json.NewEncoder(w).Encode(response)
+    log.Printf("Leaderboard state sent: %v\n", voteCounts)
 }
 
 func enableCors(w *http.ResponseWriter) {

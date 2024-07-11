@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./game-backend
+    network_mode: "host" # Ensure the backend can reach the host's network
+    ports:
+      - "8080:8080"
+

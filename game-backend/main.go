@@ -20,7 +20,7 @@ var (
         "left":  0,
         "right": 0,
     }
-    mutex sync.Mutex
+    mutex     sync.Mutex
     direction string
 )
 
@@ -29,10 +29,12 @@ func voteHandler(w http.ResponseWriter, r *http.Request) {
     var v Vote
     if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
+        log.Printf("Failed to decode vote: %v\n", err)
         return
     }
     mutex.Lock()
     voteCounts[v.Direction]++
+    log.Printf("Received vote: %s, Current counts: %v\n", v.Direction, voteCounts)
     mutex.Unlock()
     sendVoteToLeaderboard(v) // Send vote to leaderboard
     w.WriteHeader(http.StatusOK)
@@ -64,8 +66,8 @@ func resetVotes() {
                 maxDirection = dir
             }
         }
-        log.Printf("Votes - Up: %d, Down: %d, Left: %d, Right: %d", voteCounts["up"], voteCounts["down"], voteCounts["left"], voteCounts["right"])
-        log.Printf("Majority Direction: %s", maxDirection)
+        log.Printf("Votes - Up: %d, Down: %d, Left: %d, Right: %d\n", voteCounts["up"], voteCounts["down"], voteCounts["left"], voteCounts["right"])
+        log.Printf("Majority Direction: %s\n", maxDirection)
         direction = maxDirection
         for dir := range voteCounts {
             voteCounts[dir] = 0
@@ -76,9 +78,11 @@ func resetVotes() {
 
 func sendVoteToLeaderboard(v Vote) {
     jsonValue, _ := json.Marshal(v)
-    _, err := http.Post("http://localhost:8081/vote", "application/json", bytes.NewBuffer(jsonValue))
+    resp, err := http.Post("http://localhost:8081/vote", "application/json", bytes.NewBuffer(jsonValue))
     if err != nil {
-        log.Printf("Error sending vote to leaderboard: %v", err)
+        log.Printf("Error sending vote to leaderboard: %v\n", err)
+    } else {
+        log.Printf("Vote sent to leaderboard: %s, Status code: %d\n", v.Direction, resp.StatusCode)
     }
 }
 
