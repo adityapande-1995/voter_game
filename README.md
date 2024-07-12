@@ -22,4 +22,5 @@ You should have docker installed. Run the following on the terminal :
 Killing this script using Ctrl + C should stop all the containers.
 
 ## TODO
-- Add a systematic logging mechanism instead of spmming prints on the console.
+- Add a systematic logging mechanism instead of spamming prints on the console.
+- Isolate the network communication so that the host does not need to know what is happening.
