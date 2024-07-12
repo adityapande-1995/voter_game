@@ -13,15 +13,6 @@ start_containers() {
     xdg-open http://localhost:3000
 }
 
-# Function to start the leaderboard server
-start_leaderboard() {
-    echo "Starting leaderboard server..."
-    cd leaderboard
-    go run main.go &
-    LEADERBOARD_PID=$!
-    cd ..
-}
-
 # Function to start the spam voting script
 start_spam_script() {
     echo "Starting spam voting script..."
@@ -40,9 +31,6 @@ start_spam_script() {
 stop_all() {
     echo "Stopping all processes and containers..."
     docker compose down
-    if [ -n "$LEADERBOARD_PID" ] && kill -0 $LEADERBOARD_PID 2>/dev/null; then
-        kill $LEADERBOARD_PID
-    fi
     if [ -n "$SPAM_PID" ] && kill -0 $SPAM_PID 2>/dev/null; then
         kill $SPAM_PID
     fi
@@ -58,10 +46,9 @@ build_images
 # Start all containers
 start_containers
 
-# Follow backend and frontend logs in the background
-docker compose logs -f backend frontend &
+# Follow backend, frontend, and leaderboard logs in the background
+docker compose logs -f backend frontend leaderboard &
 
-start_leaderboard
 start_spam_script
 
 # Wait indefinitely to keep script running

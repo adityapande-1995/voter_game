@@ -15,3 +15,9 @@ services:
     ports:
       - "3000:3000"
 
+  leaderboard:
+    build:
+      context: ./leaderboard
+    network_mode: "host" # Ensure the leaderboard can reach the host's network
+    ports:
+      - "8081:8081"
