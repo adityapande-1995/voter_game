@@ -8,3 +8,10 @@ services:
     ports:
       - "8080:8080"
 
+  frontend:
+    build:
+      context: ./game-frontend
+    network_mode: "host" # Ensure the frontend can reach the host's network
+    ports:
+      - "3000:3000"
+

@@ -1,15 +1,16 @@
 #!/bin/bash
 
-# Function to build Docker image for backend
-build_backend_image() {
-    echo "Building backend Docker image..."
+# Function to build Docker images
+build_images() {
+    echo "Building Docker images..."
     docker compose build
 }
 
-# Function to start the backend container
-start_backend() {
-    echo "Starting backend container..."
+# Function to start the containers
+start_containers() {
+    echo "Starting containers..."
     docker compose up -d
+    xdg-open http://localhost:3000
 }
 
 # Function to start the leaderboard server
@@ -21,46 +22,46 @@ start_leaderboard() {
     cd ..
 }
 
-# Function to start the frontend server
-start_frontend() {
-    echo "Starting frontend server..."
-    cd game-frontend
-    npm start &
-    FRONTEND_PID=$!
-    cd ..
-    sleep 5 # Give the frontend some time to start
-}
-
 # Function to start the spam voting script
 start_spam_script() {
     echo "Starting spam voting script..."
-    ./bot_players/spam_votes.sh &
-    SPAM_PID=$!
+    if [ -f "./bot_players/spam_votes.sh" ]; then
+        cd bot_players
+        ./spam_votes.sh &
+        SPAM_PID=$!
+        cd ..
+    else
+        echo "spam_votes.sh not found!"
+        exit 1
+    fi
 }
 
 # Function to stop all running processes and containers
 stop_all() {
     echo "Stopping all processes and containers..."
     docker compose down
-    kill $LEADERBOARD_PID
-    kill $FRONTEND_PID
-    kill $SPAM_PID
+    if [ -n "$LEADERBOARD_PID" ] && kill -0 $LEADERBOARD_PID 2>/dev/null; then
+        kill $LEADERBOARD_PID
+    fi
+    if [ -n "$SPAM_PID" ] && kill -0 $SPAM_PID 2>/dev/null; then
+        kill $SPAM_PID
+    fi
     exit 0
 }
 
 # Trap CTRL+C to stop all processes and containers
 trap stop_all SIGINT
 
-# Build Docker image for backend
-build_backend_image
+# Build Docker images
+build_images
 
-# Start all services
-start_backend
-# Follow backend logs in the background
-docker compose logs -f backend &
+# Start all containers
+start_containers
+
+# Follow backend and frontend logs in the background
+docker compose logs -f backend frontend &
 
 start_leaderboard
-start_frontend
 start_spam_script
 
 # Wait indefinitely to keep script running
