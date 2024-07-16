@@ -24,7 +24,8 @@ var (
     direction string
 )
 
-func voteHandler(w http.ResponseWriter, r *http.Request) {
+// Handle a vote sent by the frontend or via curl.
+func receiveVoteHandler(w http.ResponseWriter, r *http.Request) {
     enableCors(&w)
     if r.Method == http.MethodOptions {
         return
@@ -43,7 +44,8 @@ func voteHandler(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
 }
 
-func votesHandler(w http.ResponseWriter, r *http.Request) {
+// Return a count of votes to the frontend.
+func sendVoteCountHandler(w http.ResponseWriter, r *http.Request) {
     enableCors(&w)
     if r.Method == http.MethodOptions {
         return
@@ -82,6 +84,7 @@ func resetVotes() {
     }
 }
 
+// Get cumulative votes so far from the leaderboard, and send to the frontend.
 func sendVoteToLeaderboard(v Vote) {
     jsonValue, _ := json.Marshal(v)
     resp, err := http.Post("http://localhost:8081/vote", "application/json", bytes.NewBuffer(jsonValue))
@@ -99,8 +102,8 @@ func enableCors(w *http.ResponseWriter) {
 }
 
 func main() {
-    http.HandleFunc("/vote", voteHandler)
-    http.HandleFunc("/votes", votesHandler)
+    http.HandleFunc("/vote", receiveVoteHandler)
+    http.HandleFunc("/votes", sendVoteCountHandler)
     go resetVotes()
     log.Println("Server started at :8080")
     log.Fatal(http.ListenAndServe(":8080", nil))
