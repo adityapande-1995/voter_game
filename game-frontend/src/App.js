@@ -63,9 +63,10 @@ const App = () => {
             })
             .catch((error) => {
                 console.error('Error sending vote:', error);
-                addLog(`Error sending vote: ${error}`);
+                addLog(`Error sending vote: ${JSON.stringify(error)}`);
             });
     };
+    
 
     const addLog = (message) => {
         setLogs(prevLogs => [...prevLogs, message]);
@@ -112,4 +113,3 @@ const App = () => {
 };
 
 export default App;
-

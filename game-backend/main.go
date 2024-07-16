@@ -26,6 +26,9 @@ var (
 
 func voteHandler(w http.ResponseWriter, r *http.Request) {
     enableCors(&w)
+    if r.Method == http.MethodOptions {
+        return
+    }
     var v Vote
     if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
@@ -42,6 +45,9 @@ func voteHandler(w http.ResponseWriter, r *http.Request) {
 
 func votesHandler(w http.ResponseWriter, r *http.Request) {
     enableCors(&w)
+    if r.Method == http.MethodOptions {
+        return
+    }
     mutex.Lock()
     response := struct {
         Direction string         `json:"direction"`
@@ -99,4 +105,3 @@ func main() {
     log.Println("Server started at :8080")
     log.Fatal(http.ListenAndServe(":8080", nil))
 }
-
