@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
 
@@ -7,6 +7,7 @@ const App = () => {
     const [votes, setVotes] = useState({ up: 0, down: 0, left: 0, right: 0 });
     const [leaderboard, setLeaderboard] = useState({ up: 0, down: 0, left: 0, right: 0 });
     const [logs, setLogs] = useState([]);
+    const logEndRef = useRef(null);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -32,6 +33,10 @@ const App = () => {
 
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [logs]);
 
     const moveSquare = (direction) => {
         setPosition(prevPosition => {
@@ -98,6 +103,7 @@ const App = () => {
                         {logs.map((log, index) => (
                             <p key={index}>{log}</p>
                         ))}
+                        <div ref={logEndRef} />
                     </div>
                 </div>
             </div>
