@@ -24,6 +24,13 @@ stop_all() {
 # Trap CTRL+C to stop all processes and containers
 trap stop_all SIGINT
 
+# Ensure Docker daemon is running
+if ! pgrep -x "dockerd" > /dev/null; then
+    echo "Docker daemon is not running. Starting it..."
+    sudo systemctl start docker
+    sudo systemctl enable docker
+fi
+
 # Build Docker images
 build_images
 
@@ -35,4 +42,3 @@ docker compose logs -f backend frontend leaderboard bot &
 
 # Wait indefinitely to keep script running
 wait
-
